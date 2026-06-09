@@ -1,0 +1,2354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Challan Manager</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+:root {
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --card: #ffffff;
+  --card-hover: #f8f9fa;
+  --border: #e2e5ea;
+  --border-light: #eef0f3;
+  --accent: #d97706;
+  --accent-dim: rgba(217,119,6,0.1);
+  --accent-hover: #b45309;
+  --success: #059669;
+  --success-dim: rgba(5,150,105,0.1);
+  --danger: #dc2626;
+  --danger-dim: rgba(220,38,38,0.08);
+  --info: #2563eb;
+  --info-dim: rgba(37,99,235,0.1);
+  --warn: #d97706;
+  --warn-dim: rgba(217,119,6,0.1);
+  --text: #111827;
+  --text-2: #6b7280;
+  --text-3: #9ca3af;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --radius-lg: 14px;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  --font: 'DM Sans', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ── HEADER ── */
+.header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.logo-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--accent);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 16px;
+}
+.logo-text {
+  font-family: 'DM Serif Display', serif;
+  font-size: 18px;
+  color: var(--text);
+  letter-spacing: -0.3px;
+}
+.logo-sub {
+  font-size: 11px;
+  color: var(--text-2);
+  font-family: var(--mono);
+  margin-top: -2px;
+}
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.storage-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--text-2);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px 10px;
+}
+.storage-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
+
+/* ── LAYOUT ── */
+.layout { display: flex; min-height: calc(100vh - 60px); }
+
+/* ── SIDEBAR NAV ── */
+.sidebar {
+  width: 220px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 20px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 400;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  transition: all 0.15s;
+  font-family: var(--font);
+}
+.nav-item:hover { background: var(--card); color: var(--text); }
+.nav-item.active {
+  background: var(--accent-dim);
+  color: var(--accent);
+  font-weight: 500;
+  border: 1px solid rgba(245,158,11,0.2);
+}
+.nav-item i { font-size: 16px; width: 18px; }
+.nav-divider { height: 1px; background: var(--border); margin: 8px 0; }
+.nav-section-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-3);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 0 12px;
+  margin: 4px 0;
+}
+
+/* ── MAIN CONTENT ── */
+.main {
+  flex: 1;
+  padding: 28px;
+  overflow-y: auto;
+  max-width: 960px;
+}
+
+/* ── PAGE HEADER ── */
+.page-header {
+  margin-bottom: 24px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.page-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 24px;
+  color: var(--text);
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+}
+.page-sub { font-size: 13px; color: var(--text-2); margin-top: 4px; }
+
+/* ── SECTIONS ── */
+.section { display: none; }
+.section.active { display: block; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  margin-bottom: 16px;
+}
+.card-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.card-title i { font-size: 14px; }
+
+/* ── STATS ── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--accent);
+  opacity: 0.6;
+}
+.stat-label { font-size: 11px; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; }
+.stat-value {
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--text);
+}
+.stat-icon { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-size: 28px; color: var(--text-3); opacity: 0.4; }
+
+/* ── FORMS ── */
+.form-row { display: flex; gap: 14px; margin-bottom: 14px; }
+.form-row .form-group { flex: 1; }
+.form-group { margin-bottom: 14px; }
+.form-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+input, select, textarea {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 13px;
+  padding: 9px 12px;
+  outline: none;
+  transition: border 0.15s;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+input[type="number"] { font-family: var(--mono); }
+input[type="date"] {
+  font-size: 13px;
+  padding: 9px 12px;
+  color: var(--text);
+}
+input[readonly] { background: rgba(0,0,0,0.03); color: var(--text-2); cursor: default; }
+select option { background: var(--card); }
+textarea { resize: vertical; min-height: 70px; }
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #000;
+  border-color: var(--accent);
+}
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-ghost {
+  background: transparent;
+  color: var(--text-2);
+  border-color: var(--border);
+}
+.btn-ghost:hover { background: var(--card); color: var(--text); }
+.btn-danger {
+  background: transparent;
+  color: var(--danger);
+  border-color: rgba(239,68,68,0.3);
+}
+.btn-danger:hover { background: var(--danger-dim); }
+.btn-success {
+  background: var(--success);
+  color: #000;
+  border-color: var(--success);
+}
+.btn-success:hover { opacity: 0.9; }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+.btn-icon { padding: 7px; }
+
+/* ── UPLOAD ZONE ── */
+.upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-lg);
+  padding: 40px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: rgba(255,255,255,0.01);
+}
+.upload-zone:hover {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+.upload-icon {
+  font-size: 40px;
+  color: var(--accent);
+  margin-bottom: 12px;
+  display: block;
+}
+.upload-title { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+.upload-sub { font-size: 12px; color: var(--text-2); }
+
+/* ── ITEMS TABLE ── */
+.items-header {
+  display: grid;
+  grid-template-columns: 2.5fr 1fr 0.8fr 1fr 1fr 36px;
+  gap: 8px;
+  padding: 0 4px 6px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+.items-header span {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+/* ── ITEMS HEADER ── */
+.items-header {
+  display: grid;
+  grid-template-columns: 2.5fr 1fr 0.8fr 1fr 1fr 36px;
+  gap: 8px;
+  padding: 0 4px 6px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+.items-header span {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.item-row {
+  display: grid;
+  grid-template-columns: 2.5fr 1fr 0.8fr 1fr 1fr 36px;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.item-row input { font-size: 13px; padding: 7px 10px; }
+
+/* Mobile: item rows become cards */
+@media (max-width: 768px) {
+  .items-header { display: none; }
+  .item-row {
+    display: block;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px;
+    margin-bottom: 10px;
+    position: relative;
+  }
+  .item-row input {
+    font-size: 15px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+  }
+  .item-row .i-nm { font-weight: 500; }
+  .item-row .i-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+  .item-row .i-label {
+    font-size: 10px;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 3px;
+  }
+  .item-row .del-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+}
+
+/* ── TOTAL BAR ── */
+.total-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0 0;
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+}
+.total-amount {
+  font-family: var(--mono);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--accent);
+}
+
+/* ── FILTER BAR ── */
+.filter-bar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.filter-bar select, .filter-bar input[type="month"] {
+  width: auto;
+  min-width: 130px;
+  font-size: 12px;
+  padding: 7px 10px;
+}
+.filter-bar .btn { font-size: 12px; padding: 7px 12px; }
+
+/* ── RECORDS TABLE ── */
+.records-table-wrap {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.records-table { width: 100%; border-collapse: collapse; }
+.records-table thead { background: var(--surface); }
+.records-table th {
+  text-align: left;
+  padding: 9px 10px;
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.records-table td {
+  padding: 10px 10px;
+  font-size: 12px;
+  border-bottom: 1px solid var(--border-light);
+  vertical-align: middle;
+  max-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.records-table tbody tr { transition: background 0.1s; }
+.records-table tbody tr:hover { background: var(--card-hover); }
+.records-table tbody tr:last-child td { border-bottom: none; }
+.col-date { width: 80px; }
+.col-vendor { width: 90px; font-weight: 500; }
+.col-head { width: 80px; }
+.col-items { color: var(--text-2); font-size: 11px; }
+.col-amount { width: 80px; font-family: var(--mono); font-weight: 500; color: var(--accent); }
+.col-actions { width: 130px; white-space: nowrap; }
+.action-btns { display: flex; gap: 3px; }
+.action-btns .btn { padding: 5px 7px; font-size: 13px; }
+
+/* ── BADGES ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+}
+.badge-default { background: rgba(255,255,255,0.06); color: var(--text-2); }
+.badge-success { background: var(--success-dim); color: var(--success); }
+.badge-accent { background: var(--accent-dim); color: var(--accent); }
+.badge-info { background: var(--info-dim); color: var(--info); }
+
+/* ── ITEM AUTOCOMPLETE ── */
+.item-suggest-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  z-index: 100;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.item-suggest-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border-light);
+  gap: 8px;
+}
+.item-suggest-item:last-child { border-bottom: none; }
+.item-suggest-item:hover, .item-suggest-item.active {
+  background: var(--accent-dim);
+}
+
+/* ── ACTION MENU ── */
+.action-menu {
+  position: fixed;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  z-index: 500;
+  min-width: 180px;
+  overflow: hidden;
+}
+.action-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  font-family: var(--font);
+  color: var(--text);
+  border-bottom: 1px solid var(--border-light);
+}
+.action-menu-item:last-child { border-bottom: none; }
+.action-menu-item:hover { background: var(--card-hover); }
+.action-menu-item.danger { color: var(--danger); }
+.action-menu-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 499;
+}
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-2);
+}
+.empty-state i { font-size: 40px; color: var(--text-3); margin-bottom: 12px; display: block; }
+.empty-state p { font-size: 14px; margin-bottom: 4px; }
+.empty-state small { font-size: 12px; color: var(--text-3); }
+
+/* ── COMBO FIELD ── */
+.combo-wrap { display: flex; gap: 8px; align-items: center; }
+.combo-wrap select { flex: 1; }
+.combo-new {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid rgba(217,119,6,0.25);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: var(--font);
+}
+.combo-new:hover { background: rgba(217,119,6,0.18); }
+.combo-new-row {
+  display: none;
+  gap: 8px;
+  margin-top: 6px;
+  align-items: center;
+}
+.combo-new-row.open { display: flex; }
+.combo-new-row input { font-size: 12px; padding: 6px 10px; }
+.combo-new-row .btn { font-size: 11px; padding: 6px 10px; }
+
+/* ── ALERTS ── */
+.alert {
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.alert-info { background: var(--info-dim); color: #1d4ed8; border: 1px solid rgba(37,99,235,0.2); }
+.alert-success { background: var(--success-dim); color: #065f46; border: 1px solid rgba(5,150,105,0.2); }
+.alert-warn { background: var(--warn-dim); color: #92400e; border: 1px solid rgba(217,119,6,0.2); }
+
+/* ── CHIPS ── */
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 12px;
+  color: var(--text-2);
+}
+.chip-del {
+  background: none;
+  border: none;
+  color: var(--text-3);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0;
+  margin-left: 2px;
+}
+.chip-del:hover { color: var(--danger); }
+
+/* ── MODAL ── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 1000;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 20px;
+  overflow-y: auto;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 560px;
+  padding: 24px;
+  margin: auto;
+  box-shadow: var(--shadow);
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.modal-title { font-size: 16px; font-weight: 500; }
+.modal-img {
+  width: 100%;
+  max-height: 260px;
+  object-fit: contain;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  margin-bottom: 16px;
+  background: var(--surface);
+}
+.detail-grid { display: grid; grid-template-columns: 100px 1fr; gap: 8px 16px; margin-bottom: 16px; }
+.detail-label { font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.4px; padding-top: 2px; }
+.detail-value { font-size: 13px; color: var(--text); }
+.modal-items { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
+.modal-items-title { font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+.modal-items-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.modal-items-table th { text-align: left; font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.4px; padding: 0 8px 6px 0; border-bottom: 1px solid var(--border); }
+.modal-items-table td { padding: 8px 8px 8px 0; border-bottom: 1px solid var(--border-light); }
+.modal-items-table tbody tr:last-child td { border-bottom: none; }
+.modal-total { text-align: right; font-family: var(--mono); font-size: 17px; color: var(--accent); font-weight: 500; padding-top: 12px; margin-top: 8px; border-top: 1px solid var(--border); }
+/* ── COMPARE ── */
+.compare-row {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  display: grid;
+  grid-template-columns: 1fr 100px 80px 80px 100px 100px;
+  gap: 12px;
+  align-items: center;
+  font-size: 13px;
+}
+.compare-row.lowest {
+  border-color: rgba(16,185,129,0.3);
+  background: rgba(16,185,129,0.05);
+}
+.cmp-vendor { font-weight: 500; }
+.cmp-rate { font-family: var(--mono); font-weight: 500; }
+.cmp-lowest-tag { font-size: 10px; color: var(--success); font-weight: 600; letter-spacing: 0.5px; }
+
+/* ── DIVIDER ── */
+.divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+/* ── TOAST ── */
+#toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--text);
+  color: var(--bg);
+  padding: 10px 18px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0;
+  transition: opacity 0.25s;
+  pointer-events: none;
+  z-index: 9999;
+  box-shadow: var(--shadow);
+}
+
+/* ── PREVIEW IMAGE ── */
+#previewImg {
+  width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  margin-bottom: 16px;
+}
+
+.sync-dot { width: 6px; height: 6px; border-radius: 50%; background: #888; flex-shrink: 0; transition: background 0.3s; }
+.sync-dot.ok { background: var(--success); }
+.sync-dot.err { background: var(--danger); }
+.sync-dot.busy { background: var(--accent); animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* ── BACKUP REMINDER ── */
+.backup-banner {
+  display: none;
+  background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.05));
+  border: 1px solid rgba(245,158,11,0.35);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  align-items: center;
+  gap: 14px;
+}
+.backup-banner.show { display: flex; }
+.backup-banner-icon { font-size: 22px; color: var(--accent); flex-shrink: 0; }
+.backup-banner-text { flex: 1; }
+.backup-banner-title { font-size: 13px; font-weight: 500; color: var(--accent); margin-bottom: 2px; }
+.backup-banner-sub { font-size: 12px; color: var(--text-2); }
+.backup-banner-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+/* ── IMPORT ── */
+.import-drop {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: rgba(255,255,255,0.01);
+}
+.import-drop:hover { border-color: var(--info); background: var(--info-dim); }
+.import-preview { margin-top: 14px; font-size: 13px; }
+.import-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border-light); font-size: 12px; }
+.import-row:last-child { border-bottom: none; }
+
+/* ── RESPONSIVE ── */
+/* ── MOBILE BOTTOM NAV ── */
+.mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  z-index: 200;
+  padding: 6px 0 max(6px, env(safe-area-inset-bottom));
+}
+.mobile-nav-inner {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 0;
+}
+.mobile-nav-inner::-webkit-scrollbar { display: none; }
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 0;
+  border: none;
+  background: transparent;
+  color: var(--text-3);
+  font-family: var(--font);
+  font-size: 9px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s;
+  flex: 1;
+  min-width: 0;
+}
+.mobile-nav-item i { font-size: 19px; }
+.mobile-nav-item.active { color: var(--accent); }
+.mobile-nav-item:hover { color: var(--text); }
+
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .mobile-nav { display: block; }
+  .main { padding: 16px 16px 90px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .form-row { flex-direction: column; gap: 0; }
+  .form-row.row-inline { flex-direction: row; gap: 10px; }
+  .filter-bar { gap: 6px; }
+  .compare-row { grid-template-columns: 1fr 1fr; }
+  .header { padding: 0 16px; }
+  .storage-badge { font-size: 10px; padding: 3px 8px; }
+  .logo-sub { display: none; }
+  .backup-banner { flex-direction: column; gap: 10px; }
+  .backup-banner-actions { width: 100%; }
+}
+/* ── PASSWORD LOCK ── */
+#lockScreen {
+  position: fixed;
+  inset: 0;
+  background: #f4f5f7;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.lock-card {
+  background: #fff;
+  border: 1px solid #e2e5ea;
+  border-radius: 16px;
+  padding: 36px 32px;
+  width: 100%;
+  max-width: 360px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  text-align: center;
+}
+.lock-icon {
+  width: 56px;
+  height: 56px;
+  background: #fef3c7;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  font-size: 24px;
+  color: #d97706;
+}
+.lock-title { font-family: 'DM Serif Display', serif; font-size: 22px; margin-bottom: 6px; color: #111827; }
+.lock-sub { font-size: 13px; color: #6b7280; margin-bottom: 24px; }
+.lock-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid #e2e5ea;
+  border-radius: 8px;
+  font-size: 16px;
+  font-family: 'DM Sans', sans-serif;
+  color: #111827;
+  text-align: center;
+  letter-spacing: 3px;
+  margin-bottom: 12px;
+  outline: none;
+  transition: border 0.15s;
+}
+.lock-input:focus { border-color: #d97706; }
+.lock-input.error { border-color: #dc2626; animation: shake 0.3s; }
+.lock-btn {
+  width: 100%;
+  padding: 12px;
+  background: #d97706;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.lock-btn:hover { opacity: 0.9; }
+.lock-error { font-size: 12px; color: #dc2626; margin-top: 8px; min-height: 18px; }
+.lock-hint { font-size: 11px; color: #9ca3af; margin-top: 16px; }
+@keyframes shake {
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-6px)}
+  75%{transform:translateX(6px)}
+}
+</style>
+</head>
+<body>
+
+<!-- PASSWORD LOCK SCREEN -->
+<div id="lockScreen">
+  <div class="lock-card">
+    <div class="lock-icon"><i class="ti ti-lock"></i></div>
+    <div class="lock-title">Challan Manager</div>
+    <div class="lock-sub">Enter your password to access</div>
+    <input class="lock-input" type="password" id="lockInput" placeholder="••••••••" maxlength="20"
+      onkeydown="if(event.key==='Enter')checkPassword()">
+    <button class="lock-btn" onclick="checkPassword()">Unlock</button>
+    <div class="lock-error" id="lockError"></div>
+    <div class="lock-hint">This app is private — password protected</div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-icon"><i class="ti ti-receipt"></i></div>
+    <div>
+      <div class="logo-text">Challan Manager</div>
+      <div class="logo-sub">Home Construction Tracker</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="storage-badge">
+      <span class="storage-dot"></span>
+      Private · Local Storage
+    </div>
+    <div class="storage-badge" id="sheetBadge">
+      <span class="sync-dot" id="syncDot"></span>
+      <span id="syncTxt">Connecting to Sheets...</span>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <span class="nav-section-label">Entries</span>
+    <button class="nav-item active" onclick="switchTab('upload')">
+      <i class="ti ti-cloud-upload"></i> Upload Challan
+    </button>
+    <button class="nav-item" onclick="switchTab('manual')">
+      <i class="ti ti-pencil"></i> Manual Entry
+    </button>
+    <div class="nav-divider"></div>
+    <span class="nav-section-label">View</span>
+    <button class="nav-item" onclick="switchTab('records')">
+      <i class="ti ti-list-details"></i> Records
+    </button>
+    <button class="nav-item" onclick="switchTab('summary')">
+      <i class="ti ti-chart-pie"></i> Summary
+    </button>
+    <button class="nav-item" onclick="switchTab('compare')">
+      <i class="ti ti-arrows-diff"></i> Price Compare
+    </button>
+    <div class="nav-divider"></div>
+    <span class="nav-section-label">Manage</span>
+    <button class="nav-item" onclick="switchTab('settings')">
+      <i class="ti ti-adjustments-horizontal"></i> Settings
+    </button>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ── UPLOAD ── -->
+    <div id="tab-upload" class="section active">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Upload Challan</div>
+          <div class="page-sub">Attach a photo of a challan, then fill in the details</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="upload-zone" onclick="document.getElementById('fileInput').click()" id="dropzone">
+          <i class="ti ti-camera-plus upload-icon"></i>
+          <div class="upload-title">Attach a challan photo</div>
+          <div class="upload-sub">Click to browse · Works on phone camera too</div>
+        </div>
+        <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleUpload(this)">
+        <div id="uploadPreview" style="display:none; margin-top: 20px;">
+          <img id="previewImg" alt="Challan preview">
+          <div id="extractStatus"></div>
+          <div id="extractedForm"></div>
+          <div id="uploadBtns" style="display:none; gap:10px; margin-top:16px;">
+            <button class="btn btn-success" onclick="saveUpload()"><i class="ti ti-check"></i> Save Entry</button>
+            <button class="btn btn-ghost" onclick="resetUpload()">Clear</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MANUAL ── -->
+    <div id="tab-manual" class="section">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Manual Entry</div>
+          <div class="page-sub">Enter challan details by hand</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="form-row row-inline">
+          <div class="form-group">
+            <label class="form-label">Date</label>
+            <input type="date" id="m-date">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Challan / Bill no.</label>
+            <input type="text" id="m-challan" placeholder="e.g. CH-001">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Head (Category)</label>
+          <div class="combo-wrap">
+            <select id="m-cat"></select>
+            <button class="combo-new" onclick="toggleAdd('add-cat')">+ New</button>
+          </div>
+          <div class="combo-new-row" id="add-cat">
+            <input type="text" id="new-cat-txt" placeholder="New head name">
+            <button class="btn btn-primary btn-sm" onclick="addHeadInline()">Add</button>
+            <button class="btn btn-ghost btn-sm" onclick="toggleAdd('add-cat')">Cancel</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Vendor / Supplier</label>
+          <div class="combo-wrap">
+            <select id="m-ven"></select>
+            <button class="combo-new" onclick="toggleAdd('add-ven')">+ New</button>
+          </div>
+          <div class="combo-new-row" id="add-ven">
+            <input type="text" id="new-ven-txt" placeholder="New vendor name">
+            <button class="btn btn-primary btn-sm" onclick="addVendorInline()">Add</button>
+            <button class="btn btn-ghost btn-sm" onclick="toggleAdd('add-ven')">Cancel</button>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <p style="font-size:12px;color:var(--text-2);margin-bottom:8px;font-weight:500">Items</p>
+        <div class="items-header">
+          <span>Item name</span><span>Unit</span><span>Qty</span><span>Rate (₹)</span><span>Amount (₹)</span><span></span>
+        </div>
+        <div id="m-items"></div>
+        <button class="btn btn-ghost btn-sm" onclick="addItemRow('m-items')" style="margin-top:4px; margin-bottom:16px">
+          <i class="ti ti-plus"></i> Add item
+        </button>
+
+        <div class="form-group">
+          <label class="form-label">Notes</label>
+          <textarea id="m-notes" placeholder="Any remarks or reference..."></textarea>
+        </div>
+
+        <div class="total-bar">
+          <span id="m-total" style="font-family:var(--mono);font-size:16px;color:var(--accent)"></span>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-ghost" onclick="resetManual()">Clear</button>
+            <button class="btn btn-success" onclick="saveManual()"><i class="ti ti-check"></i> Save Entry</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RECORDS ── -->
+    <div id="tab-records" class="section">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Records</div>
+          <div class="page-sub">All challan & voucher entries</div>
+        </div>
+        <button class="btn btn-primary" onclick="exportCSV()"><i class="ti ti-download"></i> Export CSV</button>
+      </div>
+
+      <!-- BACKUP REMINDER BANNER -->
+      <div class="backup-banner" id="backupBanner">
+        <i class="ti ti-shield-exclamation backup-banner-icon"></i>
+        <div class="backup-banner-text">
+          <div class="backup-banner-title">Time to back up your data</div>
+          <div class="backup-banner-sub">You've added 5+ entries since your last export. Save a CSV to avoid losing data if Chrome storage is cleared.</div>
+        </div>
+        <div class="backup-banner-actions">
+          <button class="btn btn-primary btn-sm" onclick="exportCSV();dismissBackup()"><i class="ti ti-download"></i> Export now</button>
+          <button class="btn btn-ghost btn-sm" onclick="dismissBackup()">Remind later</button>
+        </div>
+      </div>
+
+      <div class="stats-grid" id="statsGrid"></div>
+
+      <div class="filter-bar">
+        <select id="f-cat" onchange="renderRecords()"><option value="">All heads</option></select>
+        <select id="f-ven" onchange="renderRecords()"><option value="">All vendors</option></select>
+        <input type="month" id="f-month" onchange="renderRecords()" style="width:150px">
+        <div style="position:relative">
+          <input type="text" id="f-item" placeholder="Search item..." oninput="renderRecords();showRecordItemSuggestions()" autocomplete="off" style="min-width:130px">
+          <div id="f-item-suggest" class="item-suggest-list" style="display:none;min-width:200px"></div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="clearFilters()"><i class="ti ti-x"></i> Clear</button>
+      </div>
+
+      <div class="records-table-wrap">
+        <div id="recordsTable" style="overflow-x:auto"></div>
+      </div>
+    </div>
+
+    <!-- ── SUMMARY ── -->
+    <div id="tab-summary" class="section">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Summary</div>
+          <div class="page-sub">Head-wise spending breakdown</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <select id="sum-month" onchange="renderSummary()" style="font-size:12px;padding:7px 10px;width:auto">
+            <option value="">All time</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Overall total card -->
+      <div id="sum-total-card" class="card" style="margin-bottom:16px;background:var(--accent);border-color:var(--accent)"></div>
+
+      <!-- Head-wise breakdown -->
+      <div id="sum-heads"></div>
+
+      <!-- Monthly trend -->
+      <div class="card" style="margin-top:8px">
+        <div class="card-title"><i class="ti ti-calendar-stats"></i> Month-wise totals</div>
+        <div id="sum-monthly"></div>
+      </div>
+    </div>
+
+    <!-- ── COMPARE ── -->
+    <div id="tab-compare" class="section">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Price Compare</div>
+          <div class="page-sub">Compare rates across vendors for any item</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="form-row" style="margin-bottom:0">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Search item</label>
+            <div style="position:relative">
+              <input type="text" id="cmp-item" placeholder="e.g. Cement, Tiles, Steel rod..." oninput="runCompare();showCmpSuggestions()" autocomplete="off">
+              <div id="cmp-suggest" class="item-suggest-list" style="display:none"></div>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Filter by head</label>
+            <select id="cmp-cat" onchange="runCompare()"><option value="">All heads</option></select>
+          </div>
+        </div>
+      </div>
+      <div id="compareOut">
+        <div class="empty-state">
+          <i class="ti ti-arrows-diff"></i>
+          <p>Type an item name above</p>
+          <small>Lowest price will be highlighted in green</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SETTINGS ── -->
+    <div id="tab-settings" class="section">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Settings</div>
+          <div class="page-sub">Manage heads, vendors and data</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="ti ti-tag"></i> Heads / Categories</div>
+        <div class="chips" id="cat-chips"></div>
+        <div class="form-row" style="margin-top:14px;margin-bottom:0">
+          <div class="form-group" style="margin-bottom:0"><input type="text" id="s-newcat" placeholder="Add new head..."></div>
+          <button class="btn btn-primary" onclick="addHeadSetting()"><i class="ti ti-plus"></i> Add</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="ti ti-building-store"></i> Vendors / Suppliers</div>
+        <p style="font-size:12px;color:var(--text-2);margin-bottom:8px">Auto-saved when you add entries. Click × to remove.</p>
+        <div class="chips" id="ven-chips"></div>
+        <div class="form-row" style="margin-top:14px;margin-bottom:0">
+          <div class="form-group" style="margin-bottom:0"><input type="text" id="s-newven" placeholder="Add new vendor..."></div>
+          <button class="btn btn-primary" onclick="addVendorSetting()"><i class="ti ti-plus"></i> Add</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="ti ti-database"></i> Data Management</div>
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:16px">Data syncs to Google Sheets automatically. On a new device, tap "Sync from Sheets" to load all your records.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-primary" onclick="loadFromSheet().then(()=>{buildFilterDDs();renderRecords();toast('Synced from Sheets!')})"><i class="ti ti-refresh"></i> Sync from Sheets</button>
+          <button class="btn btn-ghost" onclick="exportCSV()"><i class="ti ti-download"></i> Export CSV</button>
+          <button class="btn btn-ghost" onclick="openImport()"><i class="ti ti-upload"></i> Import CSV</button>
+          <a class="btn btn-ghost" href="https://docs.google.com/spreadsheets/d/1EQTcTs4mSdkjoG4FpHa-YhYGJ8jkKvtDscV4uuj21Nc/edit" target="_blank"><i class="ti ti-table"></i> View Sheet</a>
+          <button class="btn btn-danger" onclick="confirmClear()"><i class="ti ti-trash"></i> Clear all</button>
+        </div>
+        <div style="margin-top:12px;padding:10px 14px;background:var(--surface);border-radius:var(--radius-sm);font-size:12px;color:var(--text-2)">
+          <i class="ti ti-info-circle" style="vertical-align:-2px;margin-right:4px"></i>
+          Last export: <span id="lastExportTime" style="font-family:var(--mono)">Never</span>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Entry Details</div>
+      <button class="btn btn-ghost btn-sm btn-icon" onclick="closeModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<!-- IMPORT MODAL -->
+<div class="modal-overlay" id="importModal">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header">
+      <div class="modal-title"><i class="ti ti-upload" style="margin-right:6px"></i>Import CSV</div>
+      <button class="btn btn-ghost btn-sm btn-icon" onclick="closeImport()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="alert alert-info" style="margin-bottom:16px">
+      <i class="ti ti-info-circle"></i>
+      Only import a CSV that was exported from this app. Existing records will be kept — duplicates skipped.
+    </div>
+    <div class="import-drop" onclick="document.getElementById('csvInput').click()">
+      <i class="ti ti-file-text" style="font-size:32px;color:var(--info);margin-bottom:8px;display:block"></i>
+      <div style="font-size:14px;font-weight:500;margin-bottom:4px">Click to select your CSV file</div>
+      <div style="font-size:12px;color:var(--text-2)">challans_YYYY-MM-DD.csv</div>
+    </div>
+    <input type="file" id="csvInput" accept=".csv,text/csv" style="display:none" onchange="previewImport(this)">
+    <div id="importPreview" class="import-preview"></div>
+    <div id="importActions" style="display:none;gap:10px;margin-top:16px">
+      <button class="btn btn-success" onclick="confirmImport()"><i class="ti ti-check"></i> Import records</button>
+      <button class="btn btn-ghost" onclick="closeImport()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const STORE='cm_recs', CATS='cm_cats', VENS='cm_vens', LAST_EXPORT='cm_last_export', ENTRIES_SINCE_EXPORT='cm_since_export';
+
+const DEF_CATS=['Architect','Carpenter','Painter','PMC','3D','Stone','Electrical','Plumber','AC','Appliances','Hardware','Electrical Goods','Plumbing Goods','Miscellaneous'];
+
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbxytvcXmqCBAGSr_xIZwgihDR1szw60zNGCkfK6vgTeMlCFSXYTSAIT9XIE-GM9_bMo/exec';
+
+const load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch{return d}};
+const save=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+const getCats=()=>load(CATS,DEF_CATS);
+const getVens=()=>load(VENS,[]);
+const getRecs=()=>load(STORE,[]);
+// Always deduplicate records by ID before saving
+function dedupRecs(recs){
+  const seen=new Map();
+  recs.forEach(r=>seen.set(String(r.id),r));
+  return [...seen.values()];
+}
+const saveRecs=r=>save(STORE,dedupRecs(r));
+const ensureVen=v=>{if(!v)return;const vs=getVens();if(!vs.includes(v)){vs.push(v);save(VENS,vs)}};
+const fmt=n=>Math.round(n).toLocaleString('en-IN');
+const fmt2=n=>parseFloat(n).toLocaleString('en-IN',{minimumFractionDigits:0,maximumFractionDigits:2});
+
+/* ─ GOOGLE SHEETS SYNC ─ */
+function setSyncStatus(state,msg){
+  const dot=document.getElementById('syncDot');
+  const txt=document.getElementById('syncTxt');
+  if(!dot||!txt)return;
+  dot.className='sync-dot '+state;
+  txt.textContent=msg;
+}
+
+async function syncToSheet(action, rec){
+  setSyncStatus('busy','Syncing...');
+  try{
+    const payload={action, ...rec};
+    if(rec) delete payload.image;
+    await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(payload),mode:'no-cors'});
+    setSyncStatus('ok','Synced · '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}));
+  }catch(err){
+    setSyncStatus('err','Sync failed — saved locally');
+  }
+}
+
+async function loadFromSheet(){
+  setSyncStatus('busy','Loading from Google Sheets...');
+  try{
+    const res=await fetch(SCRIPT_URL+'?load=1',{mode:'cors'});
+    const data=await res.json();
+    if(data.status==='ok'&&data.records&&data.records.length>0){
+      const localRecs=getRecs();
+      // Build image map from local records
+      const localImages={};
+      localRecs.forEach(r=>{if(r.image)localImages[String(r.id)]=r.image;});
+      // Sheet records are source of truth — restore images
+      const sheetRecs=data.records.map(r=>({...r,image:localImages[String(r.id)]||null}));
+      const sheetIds=new Set(sheetRecs.map(r=>String(r.id)));
+      // Only keep local records that are NOT in sheet (true offline entries)
+      const offlineOnly=localRecs.filter(r=>!sheetIds.has(String(r.id)));
+      // Merge: sheet records + offline only — then dedup by ID
+      const final=dedupRecs([...sheetRecs,...offlineOnly]);
+      saveRecs(final);
+      // Restore vendors
+      const vendors=getVens();
+      sheetRecs.forEach(r=>{if(r.vendor&&!vendors.includes(r.vendor))vendors.push(r.vendor);});
+      save(VENS,vendors);
+      setSyncStatus('ok',`${final.length} records · ${new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}`);
+      toast(`✓ ${final.length} records loaded from Google Sheets`);
+    }else if(data.status==='ok'){
+      setSyncStatus('ok','Connected · No records in Sheet yet');
+    }else{
+      setSyncStatus('err','Could not reach Google Sheets');
+    }
+  }catch(err){
+    setSyncStatus('err','Could not reach Sheets — using local data');
+  }
+}
+function checkBackupReminder(){
+  const since=parseInt(localStorage.getItem(ENTRIES_SINCE_EXPORT)||'0');
+  const banner=document.getElementById('backupBanner');
+  if(since>=5) banner.classList.add('show');
+  else banner.classList.remove('show');
+  updateLastExportLabel();
+}
+function dismissBackup(){
+  document.getElementById('backupBanner').classList.remove('show');
+}
+function updateLastExportLabel(){
+  const el=document.getElementById('lastExportTime');
+  if(!el)return;
+  const ts=localStorage.getItem(LAST_EXPORT);
+  if(!ts){el.textContent='Never';return;}
+  const d=new Date(parseInt(ts));
+  el.textContent=d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})+' '+d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+}
+function incrementSinceExport(){
+  const n=parseInt(localStorage.getItem(ENTRIES_SINCE_EXPORT)||'0')+1;
+  localStorage.setItem(ENTRIES_SINCE_EXPORT,n);
+  if(n>=5) document.getElementById('backupBanner').classList.add('show');
+}
+
+/* ─ IMPORT CSV ─ */
+let parsedImportRows=[];
+function openImport(){
+  document.getElementById('importModal').classList.add('open');
+  document.getElementById('importPreview').innerHTML='';
+  document.getElementById('importActions').style.display='none';
+  document.getElementById('csvInput').value='';
+  parsedImportRows=[];
+}
+function closeImport(){
+  document.getElementById('importModal').classList.remove('open');
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('importModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeImport();});
+});
+
+function previewImport(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const text=e.target.result;
+    const lines=text.split('\n').map(l=>l.trim()).filter(Boolean);
+    if(lines.length<2){
+      document.getElementById('importPreview').innerHTML='<div class="alert alert-warn" style="margin-top:12px"><i class="ti ti-alert-triangle"></i> File appears empty or invalid.</div>';
+      return;
+    }
+    const headers=parseCSVLine(lines[0]).map(h=>h.toLowerCase().trim());
+    const dateIdx=headers.indexOf('date');
+    const venIdx=headers.indexOf('vendor');
+    const catIdx=headers.indexOf('head');
+    const challanIdx=headers.indexOf('challan #');
+    const itemIdx=headers.indexOf('item');
+    const unitIdx=headers.indexOf('unit');
+    const qtyIdx=headers.indexOf('qty');
+    const rateIdx=headers.indexOf('rate');
+    const totalIdx=headers.indexOf('total');
+    const notesIdx=headers.indexOf('notes');
+    const sourceIdx=headers.indexOf('source');
+
+    if(dateIdx===-1||venIdx===-1){
+      document.getElementById('importPreview').innerHTML='<div class="alert alert-warn" style="margin-top:12px"><i class="ti ti-alert-triangle"></i> Could not find required columns (Date, Vendor). Make sure this is a CSV exported from Challan Manager.</div>';
+      return;
+    }
+
+    // Group rows by entry (date+vendor+challan combo)
+    const entriesMap=new Map();
+    for(let i=1;i<lines.length;i++){
+      const cols=parseCSVLine(lines[i]);
+      const date=cols[dateIdx]||'';
+      const vendor=cols[venIdx]||'';
+      const category=cols[catIdx]||'';
+      const challan=cols[challanIdx]||'';
+      const notes=cols[notesIdx]||'';
+      const total=parseFloat(cols[totalIdx])||0;
+      const source=cols[sourceIdx]||'import';
+      const itemName=cols[itemIdx]||'';
+      const key=(date||'_')+'|'+(vendor||'_')+'|'+(challan||i);
+      if(!entriesMap.has(key)){
+        entriesMap.set(key,{id:Date.now()+i,date,vendor,category,challan,notes,total,source,items:[],image:null});
+      }
+      if(itemName){
+        entriesMap.get(key).items.push({name:itemName,unit:cols[unitIdx]||'',qty:parseFloat(cols[qtyIdx])||0,rate:parseFloat(cols[rateIdx])||0});
+      }
+    }
+    parsedImportRows=[...entriesMap.values()];
+    const existing=getRecs();
+    const existingKeys=new Set(existing.map(r=>r.date+'|'+r.vendor+'|'+r.challan));
+    const newOnes=parsedImportRows.filter(r=>!existingKeys.has(r.date+'|'+r.vendor+'|'+r.challan));
+    const dupes=parsedImportRows.length-newOnes.length;
+
+    let html=`<div style="margin-top:14px">
+      <div style="display:flex;gap:16px;margin-bottom:12px;font-size:13px">
+        <span><strong style="color:var(--success)">${newOnes.length}</strong> new entries to import</span>
+        ${dupes?`<span><strong style="color:var(--text-2)">${dupes}</strong> duplicates (will skip)</span>`:''}
+      </div>`;
+    if(newOnes.length){
+      html+=`<div style="background:var(--surface);border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--border)">`;
+      newOnes.slice(0,8).forEach(r=>{html+=`<div class="import-row"><span style="font-weight:500">${r.vendor||'—'}</span><span style="color:var(--text-2)">${r.date||'—'}</span><span class="badge badge-default">${r.category||'—'}</span><span style="font-family:var(--mono);color:var(--accent)">${r.total?'₹'+fmt(r.total):''}</span></div>`;});
+      if(newOnes.length>8) html+=`<div style="padding:8px 12px;font-size:12px;color:var(--text-3);text-align:center">...and ${newOnes.length-8} more</div>`;
+      html+=`</div>`;
+    }
+    html+=`</div>`;
+    document.getElementById('importPreview').innerHTML=html;
+    document.getElementById('importActions').style.display=newOnes.length?'flex':'none';
+    parsedImportRows=newOnes;
+  };
+  reader.readAsText(file,'UTF-8');
+}
+
+function parseCSVLine(line){
+  const result=[];let cur='';let inQ=false;
+  for(let i=0;i<line.length;i++){
+    const c=line[i];
+    if(c==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}
+    else if(c===','&&!inQ){result.push(cur);cur='';}
+    else cur+=c;
+  }
+  result.push(cur);
+  return result;
+}
+
+function confirmImport(){
+  if(!parsedImportRows.length)return;
+  const recs=getRecs();
+  parsedImportRows.forEach(r=>{recs.push(r);ensureVen(r.vendor);});
+  saveRecs(dedupRecs(recs));
+  toast(`${parsedImportRows.length} entries imported!`);
+  closeImport();
+  switchTab('records');
+}
+
+function toast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.opacity=1;
+  t.style.background=type==='err'?'#ef4444':'var(--text)';
+  setTimeout(()=>t.style.opacity=0,2600);
+}
+
+function setMobileActive(el){
+  document.querySelectorAll('.mobile-nav-item').forEach(b=>b.classList.remove('active'));
+  if(el) el.classList.add('active');
+}
+
+function switchTab(id){
+  const sidebarIds=['upload','manual','records','summary','compare','settings'];
+  const mobileIds=['upload','manual','records','summary','compare','settings'];
+  document.querySelectorAll('.nav-item').forEach((n,i)=>n.classList.toggle('active',sidebarIds[i]===id));
+  document.querySelectorAll('.mobile-nav-item').forEach((n,i)=>n.classList.toggle('active',mobileIds[i]===id));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  if(id==='records'){buildFilterDDs();renderRecords();checkBackupReminder();}
+  if(id==='compare'){buildCompareDDs();runCompare();}
+  if(id==='summary')renderSummary();
+  if(id==='settings')renderSettings();
+  if(id==='manual')buildManualForm();
+}
+
+/* ─ MANUAL ─ */
+function buildManualForm(){
+  const cats=getCats(),vens=getVens();
+  document.getElementById('m-cat').innerHTML=cats.map(c=>`<option>${c}</option>`).join('');
+  document.getElementById('m-ven').innerHTML=(vens.length?vens:['(Add a vendor first)']).map(v=>`<option>${v}</option>`).join('');
+  if(!document.getElementById('m-date').value) document.getElementById('m-date').value=new Date().toISOString().slice(0,10);
+  if(!document.querySelectorAll('#m-items .irow').length) addItemRow('m-items');
+}
+
+function toggleAdd(id){
+  const e=document.getElementById(id);
+  e.classList.toggle('open');
+}
+
+function addHeadInline(){
+  const v=document.getElementById('new-cat-txt').value.trim();if(!v)return;
+  const cats=getCats();if(!cats.includes(v)){cats.push(v);save(CATS,cats);}
+  buildManualForm();document.getElementById('m-cat').value=v;
+  document.getElementById('new-cat-txt').value='';
+  document.getElementById('add-cat').classList.remove('open');
+  toast('Head added');
+}
+function addVendorInline(){
+  const v=document.getElementById('new-ven-txt').value.trim();if(!v)return;
+  ensureVen(v);buildManualForm();document.getElementById('m-ven').value=v;
+  document.getElementById('new-ven-txt').value='';
+  document.getElementById('add-ven').classList.remove('open');
+  toast('Vendor added');
+}
+
+function getItemSuggestions(){
+  const items={};
+  getRecs().forEach(r=>(r.items||[]).forEach(i=>{
+    if(!i.name)return;
+    const key=i.name.toLowerCase();
+    if(!items[key]) items[key]={name:i.name,unit:i.unit||'',rate:i.rate||0,count:0};
+    items[key].count++;
+    // Keep most recent unit and rate
+    if(i.unit) items[key].unit=i.unit;
+    if(i.rate) items[key].rate=i.rate;
+  }));
+  return Object.values(items).sort((a,b)=>b.count-a.count);
+}
+
+function addItemRow(cid){
+  const c=document.getElementById(cid);
+  const d=document.createElement('div');
+  d.className='item-row irow';
+  const listId='item-suggestions-'+Date.now();
+  d.innerHTML=`
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;position:relative">
+      <div style="flex:1;position:relative">
+        <input type="text" placeholder="Item name" class="i-nm" style="width:100%;font-size:15px;font-weight:500" autocomplete="off">
+        <div class="item-suggest-list" style="display:none"></div>
+      </div>
+      <button class="btn btn-danger btn-sm btn-icon del-btn" onclick="this.closest('.irow').remove();calcTotal()" aria-label="Remove" style="flex-shrink:0;padding:8px"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="i-grid">
+      <div>
+        <div class="i-label">Unit</div>
+        <input type="text" placeholder="kg / bags" class="i-un" style="width:100%;font-size:14px">
+      </div>
+      <div>
+        <div class="i-label">Qty</div>
+        <input type="number" placeholder="0" class="i-qt" min="0" style="width:100%;font-size:14px">
+      </div>
+      <div>
+        <div class="i-label">Rate ₹</div>
+        <input type="number" placeholder="0.00" class="i-rt" min="0" style="width:100%;font-size:14px">
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;align-items:center;margin-top:8px;padding-top:6px;border-top:1px solid var(--border-light)">
+      <span style="font-size:11px;color:var(--text-2)">Amount: </span><strong class="i-amt-lbl" style="color:var(--accent);font-family:var(--mono);margin-left:4px;font-size:13px">—</strong>
+    </div>
+    <input type="hidden" class="i-am">`;
+  c.appendChild(d);
+
+  const nm=d.querySelector('.i-nm');
+  const sugList=d.querySelector('.item-suggest-list');
+  const q=d.querySelector('.i-qt'),r=d.querySelector('.i-rt'),a=d.querySelector('.i-am'),lbl=d.querySelector('.i-amt-lbl');
+
+  const calc=()=>{
+    const qv=parseFloat(q.value)||0,rv=parseFloat(r.value)||0;
+    const amt=qv&&rv?(qv*rv):0;
+    a.value=amt?amt.toFixed(2):'';
+    lbl.textContent=amt?'₹'+amt.toLocaleString('en-IN',{maximumFractionDigits:2}):'—';
+    calcTotal();
+  };
+  q.addEventListener('input',calc);r.addEventListener('input',calc);
+
+  // Autocomplete
+  nm.addEventListener('input',()=>{
+    const val=nm.value.trim().toLowerCase();
+    sugList.innerHTML='';
+    if(!val){sugList.style.display='none';return;}
+    const matches=getItemSuggestions().filter(i=>i.name.toLowerCase().includes(val)).slice(0,6);
+    if(!matches.length){sugList.style.display='none';return;}
+    matches.forEach(item=>{
+      const el=document.createElement('div');
+      el.className='item-suggest-item';
+      el.innerHTML=`<span style="font-weight:500">${item.name}</span><span style="color:var(--text-2);font-size:11px">${item.unit||''}${item.rate?' · ₹'+item.rate:''}</span>`;
+      el.onmousedown=(e)=>{
+        e.preventDefault();
+        nm.value=item.name;
+        if(item.unit) d.querySelector('.i-un').value=item.unit;
+        if(item.rate){r.value=item.rate;calc();}
+        sugList.style.display='none';
+        q.focus();
+      };
+      sugList.appendChild(el);
+    });
+    sugList.style.display='block';
+  });
+
+  nm.addEventListener('blur',()=>setTimeout(()=>sugList.style.display='none',150));
+  nm.addEventListener('keydown',e=>{
+    const items=sugList.querySelectorAll('.item-suggest-item');
+    const active=sugList.querySelector('.item-suggest-item.active');
+    if(e.key==='ArrowDown'){
+      e.preventDefault();
+      const next=active?active.nextSibling:items[0];
+      if(active) active.classList.remove('active');
+      if(next) next.classList.add('active');
+    }else if(e.key==='ArrowUp'){
+      e.preventDefault();
+      const prev=active?active.previousSibling:null;
+      if(active) active.classList.remove('active');
+      if(prev) prev.classList.add('active');
+    }else if(e.key==='Enter'&&active){
+      e.preventDefault();
+      active.onmousedown(e);
+    }else if(e.key==='Escape'){
+      sugList.style.display='none';
+    }
+  });
+
+  nm.focus();
+}
+
+function calcTotal(){
+  let t=0;
+  document.querySelectorAll('#m-items .irow').forEach(r=>{
+    t+=(parseFloat(r.querySelector('.i-qt').value)||0)*(parseFloat(r.querySelector('.i-rt').value)||0);
+  });
+  document.getElementById('m-total').textContent=t>0?'Total  ₹'+fmt2(t):'';
+}
+
+function saveManual(){
+  const ven=document.getElementById('m-ven').value;
+  if(!ven||ven==='(Add a vendor first)'){toast('Please select or add a vendor','err');return;}
+  const items=[];
+  document.querySelectorAll('#m-items .irow').forEach(r=>{
+    const n=r.querySelector('.i-nm').value.trim();
+    if(n) items.push({name:n,unit:r.querySelector('.i-un').value,qty:parseFloat(r.querySelector('.i-qt').value)||0,rate:parseFloat(r.querySelector('.i-rt').value)||0});
+  });
+  if(!items.length){toast('Add at least one item','err');return;}
+  const rec={id:editingId||Date.now(),date:document.getElementById('m-date').value,vendor:ven,category:document.getElementById('m-cat').value,challan:document.getElementById('m-challan').value.trim(),notes:document.getElementById('m-notes').value.trim(),items,total:items.reduce((s,i)=>s+i.qty*i.rate,0),source:'manual',image:null};
+  let recs=getRecs();
+  const isEdit=!!editingId;
+  if(editingId){
+    recs=recs.map(r=>r.id===editingId?rec:r);
+    editingId=null;
+  }else{
+    recs.push(rec);
+    incrementSinceExport();
+  }
+  saveRecs(recs);ensureVen(ven);
+  syncToSheet(isEdit?'update':'insert', rec);
+  showSaveSuccess(rec);
+}
+
+function showSaveSuccess(rec){
+  const main=document.querySelector('#tab-manual .card');
+  main.innerHTML=`
+    <div style="text-align:center;padding:32px 16px">
+      <div style="width:56px;height:56px;background:var(--success-dim);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:26px;color:var(--success)">
+        <i class="ti ti-check"></i>
+      </div>
+      <div style="font-size:18px;font-weight:500;margin-bottom:6px">Entry saved!</div>
+      <div style="font-size:13px;color:var(--text-2);margin-bottom:4px">${rec.vendor} · ${rec.date}</div>
+      <div style="font-family:var(--mono);font-size:20px;color:var(--accent);margin-bottom:24px">₹${fmt(rec.total)}</div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="switchTab('records');setMobileActive(document.querySelectorAll('.mobile-nav-item')[2])">
+          <i class="ti ti-list-details"></i> View Records
+        </button>
+        <button class="btn btn-ghost" onclick="resetManualFull()">
+          <i class="ti ti-plus"></i> Add Another
+        </button>
+      </div>
+    </div>`;
+}
+
+function resetManualFull(){
+  const tab=document.getElementById('tab-manual');
+  tab.innerHTML=`
+    <div class="page-header">
+      <div>
+        <div class="page-title">Manual Entry</div>
+        <div class="page-sub">Enter challan details by hand</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="form-row row-inline">
+        <div class="form-group"><label class="form-label">Date</label><input type="date" id="m-date"></div>
+        <div class="form-group"><label class="form-label">Challan / Bill no.</label><input type="text" id="m-challan" placeholder="e.g. CH-001"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Head (Category)</label>
+        <div class="combo-wrap"><select id="m-cat"></select><button class="combo-new" onclick="toggleAdd('add-cat')">+ New</button></div>
+        <div class="combo-new-row" id="add-cat"><input type="text" id="new-cat-txt" placeholder="New head name"><button class="btn btn-primary btn-sm" onclick="addHeadInline()">Add</button><button class="btn btn-ghost btn-sm" onclick="toggleAdd('add-cat')">Cancel</button></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Vendor / Supplier</label>
+        <div class="combo-wrap"><select id="m-ven"></select><button class="combo-new" onclick="toggleAdd('add-ven')">+ New</button></div>
+        <div class="combo-new-row" id="add-ven"><input type="text" id="new-ven-txt" placeholder="New vendor name"><button class="btn btn-primary btn-sm" onclick="addVendorInline()">Add</button><button class="btn btn-ghost btn-sm" onclick="toggleAdd('add-ven')">Cancel</button></div>
+      </div>
+      <div class="divider"></div>
+      <p style="font-size:12px;color:var(--text-2);margin-bottom:8px;font-weight:500">Items</p>
+      <div id="m-items"></div>
+      <button class="btn btn-ghost btn-sm" onclick="addItemRow('m-items')" style="margin-top:4px;margin-bottom:16px"><i class="ti ti-plus"></i> Add item</button>
+      <div class="form-group"><label class="form-label">Notes</label><textarea id="m-notes" placeholder="Any remarks or reference..."></textarea></div>
+      <div class="total-bar">
+        <span id="m-total" style="font-family:var(--mono);font-size:16px;color:var(--accent)"></span>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-ghost" onclick="resetManualFull()">Clear</button>
+          <button class="btn btn-success" onclick="saveManual()"><i class="ti ti-check"></i> Save Entry</button>
+        </div>
+      </div>
+    </div>`;
+  buildManualForm();
+}
+
+/* ─ RECORDS ─ */
+function buildFilterDDs(){
+  const recs=getRecs(),cats=getCats(),vens=[...new Set(recs.map(r=>r.vendor))].filter(Boolean);
+  const fc=document.getElementById('f-cat'),fv=document.getElementById('f-ven');
+  const cv=fc.value,vv=fv.value;
+  fc.innerHTML='<option value="">All heads</option>'+cats.map(c=>`<option>${c}</option>`).join('');
+  fv.innerHTML='<option value="">All vendors</option>'+vens.map(v=>`<option>${v}</option>`).join('');
+  fc.value=cv;fv.value=vv;
+  // Wire up item search suggestions
+  const inp=document.getElementById('f-item');
+  if(inp&&!inp._suggestWired){
+    inp._suggestWired=true;
+    inp.addEventListener('blur',()=>setTimeout(()=>{const s=document.getElementById('f-item-suggest');if(s)s.style.display='none';},150));
+    inp.addEventListener('keydown',e=>{
+      const list=document.getElementById('f-item-suggest');
+      const items=list?.querySelectorAll('.item-suggest-item')||[];
+      const active=list?.querySelector('.item-suggest-item.active');
+      if(e.key==='ArrowDown'){e.preventDefault();const n=active?active.nextSibling:items[0];if(active)active.classList.remove('active');if(n)n.classList.add('active');}
+      else if(e.key==='ArrowUp'){e.preventDefault();const p=active?.previousSibling;if(active)active.classList.remove('active');if(p)p.classList.add('active');}
+      else if(e.key==='Enter'&&active){e.preventDefault();active.onmousedown(e);}
+      else if(e.key==='Escape'){const s=document.getElementById('f-item-suggest');if(s)s.style.display='none';}
+    });
+  }
+}
+
+function showRecordItemSuggestions(){
+  const val=(document.getElementById('f-item')?.value||'').trim().toLowerCase();
+  const list=document.getElementById('f-item-suggest');
+  if(!list)return;
+  list.innerHTML='';
+  if(!val){list.style.display='none';return;}
+  const matches=getItemSuggestions().filter(i=>i.name.toLowerCase().includes(val)).slice(0,8);
+  if(!matches.length){list.style.display='none';return;}
+  matches.forEach(item=>{
+    const el=document.createElement('div');
+    el.className='item-suggest-item';
+    el.innerHTML=`<span style="font-weight:500">${item.name}</span><span style="color:var(--text-2);font-size:11px">${item.count} entr${item.count===1?'y':'ies'}</span>`;
+    el.onmousedown=(e)=>{
+      e.preventDefault();
+      document.getElementById('f-item').value=item.name;
+      list.style.display='none';
+      renderRecords();
+    };
+    list.appendChild(el);
+  });
+  list.style.display='block';
+}
+
+function renderRecords(){
+  const cat=document.getElementById('f-cat').value;
+  const ven=document.getElementById('f-ven').value;
+  const mo=document.getElementById('f-month').value;
+  const item=(document.getElementById('f-item')?.value||'').trim().toLowerCase();
+  let recs=getRecs().filter(r=>{
+    if(cat&&r.category!==cat)return false;
+    if(ven&&r.vendor!==ven)return false;
+    if(mo&&r.date&&!r.date.startsWith(mo))return false;
+    if(item&&!(r.items||[]).some(i=>i.name.toLowerCase().includes(item)))return false;
+    return true;
+  }).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  const tot=recs.reduce((s,r)=>s+(r.total||0),0);
+  document.getElementById('statsGrid').innerHTML=`
+    <div class="stat-card"><div class="stat-label">Total entries</div><div class="stat-value">${recs.length}</div><i class="ti ti-file stat-icon"></i></div>
+    <div class="stat-card"><div class="stat-label">Total spent</div><div class="stat-value">₹${fmt(tot)}</div><i class="ti ti-currency-rupee stat-icon"></i></div>
+    <div class="stat-card"><div class="stat-label">Vendors</div><div class="stat-value">${[...new Set(recs.map(r=>r.vendor))].length}</div><i class="ti ti-building-store stat-icon"></i></div>
+    <div class="stat-card"><div class="stat-label">Heads used</div><div class="stat-value">${[...new Set(recs.map(r=>r.category))].length}</div><i class="ti ti-tag stat-icon"></i></div>`;
+  if(!recs.length){
+    document.getElementById('recordsTable').innerHTML=`<div class="empty-state"><i class="ti ti-inbox"></i><p>No entries yet</p><small>Upload a challan or add one manually to get started</small></div>`;
+    return;
+  }
+  const rows=recs.map(r=>`<tr>
+    <td class="col-date" style="font-family:var(--mono);font-size:11px;color:var(--text-2)">${r.date||'—'}</td>
+    <td class="col-vendor" style="font-size:12px;font-weight:500">${r.vendor||'—'}</td>
+    <td class="col-head"><span class="badge badge-default" style="font-size:10px">${r.category||'—'}</span></td>
+    <td class="col-items" style="font-size:11px;color:var(--text-2)">${(r.items||[]).map(i=>i.name).join(', ')||'—'}</td>
+    <td class="col-amount" style="font-size:12px;font-weight:500;color:var(--accent)">${r.total?'₹'+fmt(r.total):'—'}</td>
+    <td class="col-actions">
+      <button class="btn btn-ghost btn-sm" onclick="openActionMenu(${r.id},this)" style="font-size:18px;padding:4px 10px;letter-spacing:1px">···</button>
+    </td>
+  </tr>`).join('');
+  document.getElementById('recordsTable').innerHTML=`<table class="records-table"><thead><tr><th class="col-date">Date</th><th class="col-vendor">Vendor</th><th class="col-head">Head</th><th>Items</th><th class="col-amount">Amount</th><th class="col-actions"></th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function openActionMenu(id, btn){
+  document.querySelectorAll('.action-menu,.action-menu-overlay').forEach(e=>e.remove());
+  const overlay=document.createElement('div');
+  overlay.className='action-menu-overlay';
+  overlay.onclick=()=>document.querySelectorAll('.action-menu,.action-menu-overlay').forEach(e=>e.remove());
+  document.body.appendChild(overlay);
+  const menu=document.createElement('div');
+  menu.className='action-menu';
+  menu.innerHTML=`
+    <button class="action-menu-item" onclick="closeActionMenu();viewRec(${id})"><i class="ti ti-eye" style="color:var(--text-2)"></i> View details</button>
+    <button class="action-menu-item" onclick="closeActionMenu();editRec(${id})"><i class="ti ti-edit" style="color:var(--accent)"></i> Edit</button>
+    <button class="action-menu-item" onclick="closeActionMenu();dupRec(${id})"><i class="ti ti-copy" style="color:var(--info)"></i> Duplicate</button>
+    <button class="action-menu-item danger" onclick="closeActionMenu();delRec(${id})"><i class="ti ti-trash"></i> Delete</button>`;
+  document.body.appendChild(menu);
+  const rect=btn.getBoundingClientRect();
+  const menuW=190;const menuH=200;
+  let top=rect.bottom+4;
+  let left=rect.right-menuW;
+  if(top+menuH>window.innerHeight) top=rect.top-menuH-4;
+  if(left<8) left=8;
+  if(left+menuW>window.innerWidth-8) left=window.innerWidth-menuW-8;
+  menu.style.cssText=`position:fixed;top:${top}px;left:${left}px;z-index:9999`;
+}
+function closeActionMenu(){
+  document.querySelectorAll('.action-menu,.action-menu-overlay').forEach(e=>e.remove());
+}
+
+function viewRec(id){
+  const r=getRecs().find(x=>x.id===id);if(!r)return;
+  document.getElementById('modalTitle').textContent=`${r.vendor||'Entry'} · ${r.date||''}`;
+  let h='';
+  if(r.image) h+=`<img src="${r.image}" class="modal-img" alt="Challan">`;
+  else h+=`<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;text-align:center;color:var(--text-2);margin-bottom:16px;font-size:13px"><i class="ti ti-file" style="font-size:28px;display:block;margin-bottom:8px;color:var(--text-3)"></i>Manual entry — no image attached</div>`;
+  h+=`<div class="detail-grid">
+    <span class="detail-label">Date</span><span class="detail-value" style="font-family:var(--mono)">${r.date||'—'}</span>
+    <span class="detail-label">Vendor</span><span class="detail-value" style="font-weight:500">${r.vendor||'—'}</span>
+    <span class="detail-label">Head</span><span class="detail-value"><span class="badge badge-default">${r.category||'—'}</span></span>
+    <span class="detail-label">Challan #</span><span class="detail-value" style="font-family:var(--mono)">${r.challan||'—'}</span>
+    ${r.notes?`<span class="detail-label">Notes</span><span class="detail-value">${r.notes}</span>`:''}
+  </div>`;
+  if(r.items&&r.items.length){
+    h+=`<div class="modal-items"><div class="modal-items-title">Items</div><table class="modal-items-table"><thead><tr><th>Item</th><th>Unit</th><th>Qty</th><th>Rate ₹</th><th style="text-align:right">Amount ₹</th></tr></thead><tbody>`;
+    r.items.forEach(i=>{const a=i.qty&&i.rate?i.qty*i.rate:null;h+=`<tr><td>${i.name}</td><td style="color:var(--text-2)">${i.unit||'—'}</td><td style="font-family:var(--mono)">${i.qty||'—'}</td><td style="font-family:var(--mono)">${i.rate?'₹'+i.rate:'—'}</td><td style="font-family:var(--mono);text-align:right;font-weight:500">${a?'₹'+fmt2(a):'—'}</td></tr>`;});
+    h+=`</tbody></table></div>`;
+  }
+  if(r.total) h+=`<div class="modal-total">Total  ₹${fmt2(r.total)}</div>`;
+  h+=`<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap">
+    <button class="btn btn-primary" style="flex:1" onclick="closeModal();editRec(${r.id})"><i class="ti ti-edit"></i> Edit</button>
+    <button class="btn btn-ghost" onclick="closeModal();dupRec(${r.id})" style="color:var(--info)"><i class="ti ti-copy"></i> Duplicate</button>
+    <button class="btn btn-danger" onclick="closeModal();delRec(${r.id})"><i class="ti ti-trash"></i></button>
+  </div>`;
+  document.getElementById('modalBody').innerHTML=h;
+  document.getElementById('detailModal').classList.add('open');
+}
+
+let editingId=null;
+
+function editRec(id){
+  const r=getRecs().find(x=>x.id===id);if(!r)return;
+  editingId=id;
+  // Always restore the full manual form first (in case it shows success screen)
+  resetManualFull();
+  // Switch to manual tab
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('tab-manual').classList.add('active');
+  const allIds=['upload','manual','records','summary','compare','settings'];
+  document.querySelectorAll('.nav-item').forEach((n,i)=>n.classList.toggle('active',allIds[i]==='manual'));
+  document.querySelectorAll('.mobile-nav-item').forEach((n,i)=>n.classList.toggle('active',allIds[i]==='manual'));
+  // Fill in data after form is rendered
+  setTimeout(()=>{
+    const cats=getCats(),vens=getVens();
+    document.getElementById('m-date').value=r.date||'';
+    document.getElementById('m-challan').value=r.challan||'';
+    document.getElementById('m-cat').innerHTML=cats.map(c=>`<option ${c===r.category?'selected':''}>${c}</option>`).join('');
+    document.getElementById('m-ven').innerHTML=vens.map(v=>`<option ${v===r.vendor?'selected':''}>${v}</option>`).join('');
+    document.getElementById('m-notes').value=r.notes||'';
+    document.getElementById('m-items').innerHTML='';
+    (r.items||[]).forEach(item=>{
+      addItemRow('m-items');
+      const rows=document.querySelectorAll('#m-items .irow');
+      const row=rows[rows.length-1];
+      row.querySelector('.i-nm').value=item.name||'';
+      row.querySelector('.i-un').value=item.unit||'';
+      row.querySelector('.i-qt').value=item.qty||'';
+      row.querySelector('.i-rt').value=item.rate||'';
+      if(item.qty&&item.rate){
+        const lbl=row.querySelector('.i-amt-lbl');
+        if(lbl) lbl.textContent='₹'+(item.qty*item.rate).toLocaleString('en-IN',{maximumFractionDigits:2});
+        row.querySelector('.i-am').value=(item.qty*item.rate).toFixed(2);
+      }
+    });
+    calcTotal();
+    // Show editing banner
+    const card=document.querySelector('#tab-manual .card');
+    if(card&&!document.getElementById('edit-banner')){
+      const banner=document.createElement('div');
+      banner.id='edit-banner';
+      banner.style.cssText='background:var(--accent-dim);border:1px solid var(--accent);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--accent)';
+      banner.innerHTML=`<span><i class="ti ti-edit" style="vertical-align:-2px;margin-right:6px"></i>Editing — ${r.vendor} · ${r.date}</span><button class="btn btn-ghost btn-sm" onclick="cancelEdit()" style="color:var(--text-2)"><i class="ti ti-x"></i> Cancel</button>`;
+      card.insertBefore(banner,card.firstChild);
+    }
+    window.scrollTo({top:0,behavior:'smooth'});
+  },80);
+}
+
+function cancelEdit(){
+  editingId=null;
+  const banner=document.getElementById('edit-banner');
+  if(banner) banner.remove();
+  resetManualFull();
+  toast('Edit cancelled — no changes made');
+}
+
+function dupRec(id){
+  const r=getRecs().find(x=>x.id===id);if(!r)return;
+  const copy={...r,id:Date.now(),date:new Date().toISOString().slice(0,10),challan:'',source:'manual',image:null};
+  const recs=getRecs();recs.push(copy);saveRecs(recs);
+  syncToSheet('insert', copy);
+  incrementSinceExport();
+  toast('Entry duplicated — edit date/details as needed');
+  buildFilterDDs();renderRecords();
+}
+function closeModal(){document.getElementById('detailModal').classList.remove('open');}
+document.getElementById('detailModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
+
+function delRec(id){
+  if(!confirm('Delete this entry permanently?'))return;
+  const rec=getRecs().find(r=>r.id===id);
+  saveRecs(getRecs().filter(r=>r.id!==id));
+  if(rec) syncToSheet('delete', {id});
+  buildFilterDDs();renderRecords();toast('Entry deleted');
+}
+
+function clearFilters(){
+  ['f-cat','f-ven','f-month','f-item'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  renderRecords();
+}
+
+function exportCSV(){
+  const recs=getRecs();if(!recs.length){toast('No data to export','err');return;}
+  const rows=[['Date','Vendor','Head','Challan #','Item','Unit','Qty','Rate','Item Amount','Total','Notes','Source']];
+  recs.forEach(r=>{
+    if(r.items&&r.items.length){
+      r.items.forEach((item,i)=>{rows.push([i===0?r.date||'':'',i===0?r.vendor||'':'',i===0?r.category||'':'',i===0?r.challan||'':'',item.name,item.unit||'',item.qty||'',item.rate||'',(item.qty&&item.rate?item.qty*item.rate:'').toString(),i===0&&r.total?Math.round(r.total):'',i===0?r.notes||'':'',i===0?r.source||'':'']);});
+    }else{rows.push([r.date||'',r.vendor||'',r.category||'',r.challan||'','','','','','',r.total?Math.round(r.total):'',r.notes||'',r.source||'']);}
+  });
+  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download='challans_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+  localStorage.setItem(LAST_EXPORT,Date.now());
+  localStorage.setItem(ENTRIES_SINCE_EXPORT,'0');
+  dismissBackup();
+  updateLastExportLabel();
+  toast('CSV downloaded! Save it to Google Drive or WhatsApp for safekeeping.');
+}
+
+/* ─ COMPARE ─ */
+function buildCompareDDs(){
+  document.getElementById('cmp-cat').innerHTML='<option value="">All heads</option>'+getCats().map(c=>`<option>${c}</option>`).join('');
+  // Wire up compare suggestions
+  const inp=document.getElementById('cmp-item');
+  inp.addEventListener('blur',()=>setTimeout(()=>{const s=document.getElementById('cmp-suggest');if(s)s.style.display='none';},150));
+  inp.addEventListener('keydown',e=>{
+    const list=document.getElementById('cmp-suggest');
+    const items=list?.querySelectorAll('.item-suggest-item')||[];
+    const active=list?.querySelector('.item-suggest-item.active');
+    if(e.key==='ArrowDown'){e.preventDefault();const n=active?active.nextSibling:items[0];if(active)active.classList.remove('active');if(n)n.classList.add('active');}
+    else if(e.key==='ArrowUp'){e.preventDefault();const p=active?.previousSibling;if(active)active.classList.remove('active');if(p)p.classList.add('active');}
+    else if(e.key==='Enter'&&active){e.preventDefault();active.onmousedown(e);}
+    else if(e.key==='Escape'&&list){list.style.display='none';}
+  });
+}
+
+function showCmpSuggestions(){
+  const val=document.getElementById('cmp-item').value.trim().toLowerCase();
+  const list=document.getElementById('cmp-suggest');
+  list.innerHTML='';
+  if(!val){list.style.display='none';return;}
+  const matches=getItemSuggestions().filter(i=>i.name.toLowerCase().includes(val)).slice(0,6);
+  if(!matches.length){list.style.display='none';return;}
+  matches.forEach(item=>{
+    const el=document.createElement('div');
+    el.className='item-suggest-item';
+    el.innerHTML=`<span style="font-weight:500">${item.name}</span><span style="color:var(--text-2);font-size:11px">${item.unit||''}</span>`;
+    el.onmousedown=(e)=>{
+      e.preventDefault();
+      document.getElementById('cmp-item').value=item.name;
+      list.style.display='none';
+      runCompare();
+    };
+    list.appendChild(el);
+  });
+  list.style.display='block';
+}
+
+function runCompare(){
+  const q=document.getElementById('cmp-item').value.trim().toLowerCase();
+  const cat=document.getElementById('cmp-cat').value;
+  if(!q&&!cat){document.getElementById('compareOut').innerHTML=`<div class="empty-state"><i class="ti ti-arrows-diff"></i><p>Type an item name above</p><small>Lowest price highlighted in green</small></div>`;return;}
+  const res=[];
+  getRecs().forEach(r=>{
+    if(cat&&r.category!==cat)return;
+    (r.items||[]).forEach(item=>{if(!q||item.name.toLowerCase().includes(q)) res.push({vendor:r.vendor,cat:r.category,date:r.date,item:item.name,unit:item.unit,qty:item.qty,rate:item.rate});});
+  });
+  if(!res.length){document.getElementById('compareOut').innerHTML=`<div class="empty-state"><i class="ti ti-search-off"></i><p>No matching items found</p><small>Try a different search term</small></div>`;return;}
+  res.sort((a,b)=>(a.rate||0)-(b.rate||0));
+  const rates=res.map(r=>r.rate||0).filter(r=>r>0);
+  const minR=rates.length?Math.min(...rates):null;
+  const html=res.map(r=>{const isMin=minR&&r.rate===minR;return`<div class="compare-row${isMin?' lowest':''}">
+    <div><div class="cmp-vendor">${r.vendor||'—'}</div><div style="font-size:11px;color:var(--text-2)">${r.item}</div></div>
+    <div style="font-size:12px;color:var(--text-2)">${r.date||'—'}</div>
+    <div style="font-size:12px;color:var(--text-2)">${r.unit||'—'}</div>
+    <div style="font-size:12px;color:var(--text-2)">${r.qty||'—'}</div>
+    <div class="cmp-rate" style="color:${isMin?'var(--success)':'var(--text)'}">₹${r.rate||'—'}</div>
+    <div><span class="badge badge-default" style="font-size:10px">${r.cat}</span>${isMin?`<div class="cmp-lowest-tag">LOWEST ✓</div>`:''}</div>
+  </div>`;}).join('');
+  document.getElementById('compareOut').innerHTML=`<div style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px;color:var(--text-2)">${res.length} result${res.length!==1?'s':''} · sorted by rate</span></div>`+html;
+}
+
+/* ─ SUMMARY ─ */
+function renderSummary(){
+  const allRecs=getRecs();
+  // Build month options
+  const months=[...new Set(allRecs.map(r=>r.date?r.date.slice(0,7):null).filter(Boolean))].sort().reverse();
+  const sel=document.getElementById('sum-month');
+  const cur=sel.value;
+  sel.innerHTML='<option value="">All time</option>'+months.map(m=>`<option value="${m}"${m===cur?'selected':''}>${new Date(m+'-01').toLocaleDateString('en-IN',{month:'long',year:'numeric'})}</option>`).join('');
+  sel.value=cur;
+
+  const filterMonth=sel.value;
+  const recs=filterMonth?allRecs.filter(r=>r.date&&r.date.startsWith(filterMonth)):allRecs;
+
+  // Grand total
+  const grandTotal=recs.reduce((s,r)=>s+(r.total||0),0);
+  document.getElementById('sum-total-card').innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:11px;font-weight:600;letter-spacing:0.6px;text-transform:uppercase;opacity:0.8;color:#fff">
+          ${filterMonth?new Date(filterMonth+'-01').toLocaleDateString('en-IN',{month:'long',year:'numeric'}):' Total Spent — All Time'}
+        </div>
+        <div style="font-family:var(--mono);font-size:28px;font-weight:500;color:#fff;margin-top:4px">₹${fmt(grandTotal)}</div>
+      </div>
+      <div style="text-align:right;color:rgba(255,255,255,0.8)">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px">${recs.length} entries</div>
+        <div style="font-size:13px;margin-top:2px">${[...new Set(recs.map(r=>r.vendor))].filter(Boolean).length} vendors</div>
+      </div>
+    </div>`;
+
+  // Head-wise breakdown
+  const headMap={};
+  const cats=getCats();
+  recs.forEach(r=>{
+    const h=r.category||'Uncategorised';
+    if(!headMap[h]) headMap[h]={total:0,count:0,vendors:new Set()};
+    headMap[h].total+=(r.total||0);
+    headMap[h].count++;
+    if(r.vendor) headMap[h].vendors.add(r.vendor);
+  });
+
+  // Sort by total descending
+  const sorted=Object.entries(headMap).sort((a,b)=>b[1].total-a[1].total);
+  const maxTotal=sorted.length?sorted[0][1].total:1;
+
+  if(!sorted.length){
+    document.getElementById('sum-heads').innerHTML=`<div class="empty-state"><i class="ti ti-chart-pie"></i><p>No data yet</p><small>Add entries to see the summary</small></div>`;
+    return;
+  }
+
+  const headColors=['#d97706','#2563eb','#059669','#dc2626','#7c3aed','#db2777','#0891b2','#65a30d','#ea580c','#4f46e5','#0d9488','#b45309','#9333ea','#16a34a'];
+
+  let html='';
+  sorted.forEach(([head,data],i)=>{
+    const pct=grandTotal>0?Math.round((data.total/grandTotal)*100):0;
+    const barPct=maxTotal>0?Math.round((data.total/maxTotal)*100):0;
+    const color=headColors[i%headColors.length];
+    // Build vendor breakdown for this head
+    const vendorMap={};
+    recs.filter(r=>r.category===head).forEach(r=>{
+      const v=r.vendor||'Unknown';
+      if(!vendorMap[v]) vendorMap[v]=0;
+      vendorMap[v]+=(r.total||0);
+    });
+    const vendorsSorted=Object.entries(vendorMap).sort((a,b)=>b[1]-a[1]);
+    const maxV=vendorsSorted.length?vendorsSorted[0][1]:1;
+    const vendorChart=vendorsSorted.map(([v,total])=>{
+      const vPct=Math.round((total/maxV)*100);
+      return`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <div style="font-size:11px;color:var(--text-2);width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0">${v}</div>
+        <div style="flex:1;height:18px;background:var(--border);border-radius:3px;overflow:hidden;position:relative">
+          <div style="height:100%;width:${vPct}%;background:${color};opacity:0.7;border-radius:3px"></div>
+          <div style="position:absolute;left:6px;top:50%;transform:translateY(-50%);font-size:10px;font-family:var(--mono);color:${vPct>35?'#fff':'var(--text)'}">₹${fmt(total)}</div>
+        </div>
+      </div>`;
+    }).join('');
+    html+=`
+    <div class="card" style="margin-bottom:10px;padding:16px 20px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;cursor:pointer" onclick="toggleHeadDetail('hd-${i}')">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:10px;height:10px;border-radius:50%;background:${color};flex-shrink:0;margin-top:3px"></div>
+          <div>
+            <div style="font-size:14px;font-weight:500">${head}</div>
+            <div style="font-size:11px;color:var(--text-2);margin-top:1px">${data.count} entr${data.count===1?'y':'ies'} · ${data.vendors.size} vendor${data.vendors.size===1?'':'s'}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="text-align:right">
+            <div style="font-family:var(--mono);font-size:16px;font-weight:500;color:${color}">₹${fmt(data.total)}</div>
+            <div style="font-size:11px;color:var(--text-2)">${pct}% of total</div>
+          </div>
+          <i class="ti ti-chevron-down" id="hd-icon-${i}" style="color:var(--text-3);transition:transform 0.2s"></i>
+        </div>
+      </div>
+      <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:0">
+        <div style="height:100%;width:${barPct}%;background:${color};border-radius:3px;transition:width 0.4s"></div>
+      </div>
+      <div id="hd-${i}" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--border-light)">
+        <div style="font-size:11px;color:var(--text-2);font-weight:500;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Vendor breakdown</div>
+        ${vendorChart}
+        <button class="btn btn-ghost btn-sm" style="margin-top:8px;font-size:11px" onclick="switchTab('records');document.getElementById('f-cat').value='${head}';renderRecords()">
+          <i class="ti ti-list-details"></i> View all ${head} records
+        </button>
+      </div>
+    </div>`;
+  });
+  document.getElementById('sum-heads').innerHTML=html;
+  renderSummaryMonthly(allRecs,filterMonth);
+}
+
+function toggleHeadDetail(id){
+  const el=document.getElementById(id);
+  const idx=id.split('-')[1];
+  const icon=document.getElementById('hd-icon-'+idx);
+  const isOpen=el.style.display==='block';
+  el.style.display=isOpen?'none':'block';
+  if(icon) icon.style.transform=isOpen?'':'rotate(180deg)';
+}
+
+function renderSummaryMonthly(allRecs,filterMonth){
+  // Monthly trend
+  if(!filterMonth){
+    const monthMap={};
+    allRecs.forEach(r=>{
+      const m=r.date?r.date.slice(0,7):null;if(!m)return;
+      if(!monthMap[m]) monthMap[m]=0;
+      monthMap[m]+=(r.total||0);
+    });
+    const monthSorted=Object.entries(monthMap).sort((a,b)=>a[0].localeCompare(b[0]));
+    const maxM=monthSorted.length?Math.max(...monthSorted.map(m=>m[1])):1;
+    let mhtml='';
+    monthSorted.forEach(([m,total])=>{
+      const pct=Math.round((total/maxM)*100);
+      const label=new Date(m+'-01').toLocaleDateString('en-IN',{month:'short',year:'2-digit'});
+      mhtml+=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="width:56px;font-size:11px;color:var(--text-2);text-align:right;flex-shrink:0">${label}</div>
+        <div style="flex:1;height:28px;background:var(--border);border-radius:4px;overflow:hidden;position:relative">
+          <div style="height:100%;width:${pct}%;background:var(--accent);border-radius:4px;opacity:0.85"></div>
+          <div style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:12px;font-family:var(--mono);font-weight:500;color:${pct>30?'#fff':'var(--text)'};white-space:nowrap">₹${fmt(total)}</div>
+        </div>
+      </div>`;
+    });
+    document.getElementById('sum-monthly').innerHTML=mhtml||'<div style="font-size:13px;color:var(--text-2)">No monthly data yet</div>';
+  } else {
+    document.getElementById('sum-monthly').innerHTML=`<div style="font-size:13px;color:var(--text-2)">Showing filtered month — select "All time" to see monthly trend</div>`;
+  }
+}
+
+/* ─ SETTINGS ─ */
+function renderSettings(){
+  const cats=getCats(),vens=getVens();
+  document.getElementById('cat-chips').innerHTML=cats.map((c,i)=>`<div class="chip">${c}<button class="chip-del" onclick="delHead(${i})" aria-label="Remove ${c}">×</button></div>`).join('');
+  document.getElementById('ven-chips').innerHTML=vens.length?vens.map((v,i)=>`<div class="chip">${v}<button class="chip-del" onclick="delVen(${i})" aria-label="Remove ${v}">×</button></div>`).join(''):'<span style="font-size:12px;color:var(--text-3)">No vendors saved yet</span>';
+}
+function addHeadSetting(){const v=document.getElementById('s-newcat').value.trim();if(!v)return;const c=getCats();if(!c.includes(v)){c.push(v);save(CATS,c);}document.getElementById('s-newcat').value='';renderSettings();toast('Head added');}
+function addVendorSetting(){const v=document.getElementById('s-newven').value.trim();if(!v)return;ensureVen(v);document.getElementById('s-newven').value='';renderSettings();toast('Vendor added');}
+function delHead(i){const c=getCats();c.splice(i,1);save(CATS,c);renderSettings();toast('Head removed');}
+function delVen(i){const v=getVens();v.splice(i,1);save(VENS,v);renderSettings();toast('Vendor removed');}
+function confirmClear(){if(confirm('Delete ALL records permanently? This cannot be undone.')){saveRecs([]);buildFilterDDs();renderRecords();toast('All records cleared');}}
+
+/* ─ UPLOAD ─ */
+let upUrl=null,upB64=null,upMeta={};
+
+function handleUpload(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    upUrl=e.target.result;upB64=e.target.result.split(',')[1];
+    document.getElementById('previewImg').src=e.target.result;
+    document.getElementById('uploadPreview').style.display='block';
+    document.getElementById('extractStatus').innerHTML='<div class="alert alert-info"><i class="ti ti-sparkles"></i> Analyzing challan with AI — please wait...</div>';
+    document.getElementById('extractedForm').innerHTML='';
+    document.getElementById('uploadBtns').style.display='none';
+    extractData(e.target.result,upB64);
+  };
+  reader.readAsDataURL(file);
+}
+
+async function extractData(dataUrl,b64){
+  // No AI extraction — show form immediately for manual fill
+  upMeta={};
+  document.getElementById('extractStatus').innerHTML='<div class="alert alert-info"><i class="ti ti-photo"></i> Photo attached — fill in the details below</div>';
+  showUploadForm({});
+}
+
+function showUploadForm(d){
+  const cats=getCats(),vens=getVens();
+  let h=`<div class="form-row"><div class="form-group"><label class="form-label">Date</label><input type="date" id="u-date" value="${d.date||new Date().toISOString().slice(0,10)}"></div><div class="form-group"><label class="form-label">Challan #</label><input type="text" id="u-challan" value="${d.challan_no||''}"></div></div>`;
+  h+=`<div class="form-row">
+    <div class="form-group"><label class="form-label">Head</label><select id="u-cat">${cats.map(c=>`<option>${c}</option>`).join('')}</select></div>
+    <div class="form-group"><label class="form-label">Vendor</label>
+      <div class="combo-wrap"><select id="u-ven" >${vens.map(v=>`<option ${d.vendor&&v.toLowerCase()===d.vendor.toLowerCase()?'selected':''}>${v}</option>`).join('')}<option value="__new">+ Add new vendor</option></select><button class="combo-new" onclick="toggleUVen()">+ NEW</button></div>
+      <div class="combo-new-row" id="u-ven-add"><input type="text" id="u-ven-txt" value="${d.vendor&&!vens.find(v=>v.toLowerCase()===d.vendor.toLowerCase())?d.vendor:''}"><button class="btn btn-primary btn-sm" onclick="confirmUVen()">Add</button></div>
+    </div>
+  </div>`;
+  upMeta._cnt=(d.items||[]).length;
+  if(d.items&&d.items.length){
+    h+=`<div style="margin:4px 0 8px"><span class="form-label">Extracted items — edit if needed</span></div>`;
+    h+=`<div class="items-header"><span>Item</span><span>Unit</span><span>Qty</span><span>Rate ₹</span><span>Amount ₹</span><span></span></div>`;
+    d.items.forEach((item,i)=>{h+=`<div class="item-row"><input type="text" value="${item.name||''}" id="un${i}"><input type="text" value="${item.unit||''}" id="uu${i}"><input type="number" value="${item.qty||''}" id="uq${i}"><input type="number" value="${item.rate||''}" id="ur${i}"><input type="number" value="${item.qty&&item.rate?(item.qty*item.rate).toFixed(2):''}" id="ua${i}" readonly><span></span></div>`;});
+  }
+  if(d.total) h+=`<div class="form-group" style="margin-top:12px"><label class="form-label">Total ₹</label><input type="number" id="u-total" value="${d.total}" style="width:180px"></div>`;
+  if(d.notes) h+=`<div class="form-group"><label class="form-label">Notes</label><input type="text" id="u-notes" value="${d.notes}"></div>`;
+  document.getElementById('extractedForm').innerHTML=h;
+  document.getElementById('uploadBtns').style.display='flex';
+  const uv=document.getElementById('u-ven');
+  if(uv) uv.addEventListener('change',()=>{document.getElementById('u-ven-add').classList.toggle('open',uv.value==='__new');});
+  if(d.vendor&&!vens.find(v=>v.toLowerCase()===d.vendor.toLowerCase())) document.getElementById('u-ven-add').classList.add('open');
+}
+function toggleUVen(){document.getElementById('u-ven-add').classList.toggle('open');}
+function confirmUVen(){
+  const v=document.getElementById('u-ven-txt').value.trim();if(!v)return;
+  ensureVen(v);
+  const sel=document.getElementById('u-ven');
+  const opt=document.createElement('option');opt.value=v;opt.textContent=v;opt.selected=true;
+  sel.insertBefore(opt,sel.querySelector('option[value="__new"]'));
+  sel.value=v;document.getElementById('u-ven-add').classList.remove('open');toast('Vendor saved');
+}
+function saveUpload(){
+  const ven=document.getElementById('u-ven')?.value;
+  if(!ven||ven==='__new'){toast('Select or add a vendor','err');return;}
+  const items=[];
+  for(let i=0;i<(upMeta._cnt||0);i++){
+    const n=document.getElementById(`un${i}`)?.value.trim();
+    if(n) items.push({name:n,unit:document.getElementById(`uu${i}`)?.value||'',qty:parseFloat(document.getElementById(`uq${i}`)?.value)||0,rate:parseFloat(document.getElementById(`ur${i}`)?.value)||0});
+  }
+  const total=parseFloat(document.getElementById('u-total')?.value)||items.reduce((s,i)=>s+i.qty*i.rate,0);
+  const rec={id:Date.now(),date:document.getElementById('u-date')?.value||new Date().toISOString().slice(0,10),vendor:ven,category:document.getElementById('u-cat')?.value||'',challan:document.getElementById('u-challan')?.value||'',notes:document.getElementById('u-notes')?.value||'',items,total,source:'upload',image:upUrl};
+  const recs=getRecs();recs.push(rec);saveRecs(recs);ensureVen(ven);
+  incrementSinceExport();
+  syncToSheet('insert', rec);
+  toast('Entry saved!');resetUpload();
+}
+function resetUpload(){
+  document.getElementById('uploadPreview').style.display='none';
+  document.getElementById('fileInput').value='';
+  document.getElementById('extractedForm').innerHTML='';
+  document.getElementById('uploadBtns').style.display='none';
+  document.getElementById('extractStatus').innerHTML='';
+  upUrl=null;upB64=null;upMeta={};
+}
+
+/* ── PASSWORD LOCK ── */
+const APP_PASSWORD = 'rabhager'; // Change this to your own password
+const SESSION_KEY = 'cm_auth_session';
+
+function checkPassword(){
+  const input = document.getElementById('lockInput').value;
+  const errEl = document.getElementById('lockError');
+  const inputEl = document.getElementById('lockInput');
+  if(input === APP_PASSWORD){
+    // Store session so they don't need to re-enter on refresh
+    sessionStorage.setItem(SESSION_KEY, 'true');
+    document.getElementById('lockScreen').style.display = 'none';
+    initApp();
+  } else {
+    errEl.textContent = 'Incorrect password. Try again.';
+    inputEl.classList.add('error');
+    inputEl.value = '';
+    setTimeout(()=>{
+      inputEl.classList.remove('error');
+      errEl.textContent = '';
+    }, 1500);
+    inputEl.focus();
+  }
+}
+
+function initApp(){
+  buildManualForm();
+  checkBackupReminder();
+  loadFromSheet();
+}
+
+// Check if already authenticated this session
+if(sessionStorage.getItem(SESSION_KEY) === 'true'){
+  document.getElementById('lockScreen').style.display = 'none';
+  initApp();
+} else {
+  // Focus the password input
+  setTimeout(()=>document.getElementById('lockInput').focus(), 100);
+}
+</script>
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-nav" aria-label="Main navigation">
+  <div class="mobile-nav-inner">
+    <button class="mobile-nav-item active" onclick="switchTab('upload');setMobileActive(this)">
+      <i class="ti ti-cloud-upload"></i>Upload
+    </button>
+    <button class="mobile-nav-item" onclick="switchTab('manual');setMobileActive(this)">
+      <i class="ti ti-pencil"></i>Manual
+    </button>
+    <button class="mobile-nav-item" onclick="switchTab('records');setMobileActive(this)">
+      <i class="ti ti-list-details"></i>Records
+    </button>
+    <button class="mobile-nav-item" onclick="switchTab('summary');setMobileActive(this)">
+      <i class="ti ti-chart-pie"></i>Summary
+    </button>
+    <button class="mobile-nav-item" onclick="switchTab('compare');setMobileActive(this)">
+      <i class="ti ti-arrows-diff"></i>Compare
+    </button>
+    <button class="mobile-nav-item" onclick="switchTab('settings');setMobileActive(this)">
+      <i class="ti ti-settings"></i>Settings
+    </button>
+  </div>
+</nav>
+
+</body>
+</html>

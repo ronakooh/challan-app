@@ -455,7 +455,7 @@ textarea { resize: vertical; min-height: 70px; }
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  overflow: hidden;
+  overflow-x: auto;
 }
 .records-table { width: 100%; border-collapse: collapse; }
 .records-table thead { background: var(--surface); }
@@ -471,24 +471,20 @@ textarea { resize: vertical; min-height: 70px; }
   white-space: nowrap;
 }
 .records-table td {
-  padding: 10px 10px;
-  font-size: 12px;
+  padding: 11px 10px;
+  font-size: 13px;
   border-bottom: 1px solid var(--border-light);
   vertical-align: middle;
-  max-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 .records-table tbody tr { transition: background 0.1s; }
 .records-table tbody tr:hover { background: var(--card-hover); }
 .records-table tbody tr:last-child td { border-bottom: none; }
-.col-date { width: 80px; }
-.col-vendor { width: 90px; font-weight: 500; }
-.col-head { width: 80px; }
-.col-items { color: var(--text-2); font-size: 11px; }
-.col-amount { width: 80px; font-family: var(--mono); font-weight: 500; color: var(--accent); }
-.col-actions { width: 130px; white-space: nowrap; }
+.col-date { width: 75px; white-space: nowrap; font-size: 11px; color: var(--text-2); }
+.col-vendor { min-width: 100px; font-weight: 500; }
+.col-head { min-width: 90px; }
+.col-items { color: var(--text-2); font-size: 12px; min-width: 130px; }
+.col-amount { width: 90px; font-family: var(--mono); font-weight: 500; color: var(--accent); white-space: nowrap; }
+.col-actions { width: 52px; }
 .action-btns { display: flex; gap: 3px; }
 .action-btns .btn { padding: 5px 7px; font-size: 13px; }
 
@@ -847,6 +843,36 @@ textarea { resize: vertical; min-height: 70px; }
   .backup-banner { flex-direction: column; gap: 10px; }
   .backup-banner-actions { width: 100%; }
 }
+/* ─ PUSH MISSING TO SHEET ─ */
+async function pushMissingToSheet() {
+  setSyncStatus('busy', 'Checking Sheet...');
+  try {
+    const res = await fetch(SCRIPT_URL + '?load=1', { mode: 'cors' });
+    const data = await res.json();
+    const sheetIds = new Set((data.records || []).map(r => String(r.id)));
+    const local = getRecs();
+    const missing = local.filter(r => !sheetIds.has(String(r.id)));
+    if (!missing.length) {
+      setSyncStatus('ok', 'All records in Sheet');
+      toast('Nothing missing — Sheet is up to date!');
+      return;
+    }
+    toast('Found ' + missing.length + ' missing — syncing...');
+    for (let i = 0; i < missing.length; i++) {
+      setSyncStatus('busy', 'Pushing ' + (i+1) + ' of ' + missing.length + '...');
+      const rec = { ...missing[i] };
+      delete rec.image;
+      await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'insert', ...rec }), mode: 'no-cors' });
+      if (i < missing.length - 1) await new Promise(r => setTimeout(r, 600));
+    }
+    setSyncStatus('ok', 'Pushed ' + missing.length + ' records · ' + new Date().toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit'}));
+    toast('Done! ' + missing.length + ' records synced to Sheet');
+  } catch(err) {
+    setSyncStatus('err', 'Push failed');
+    toast('Push failed — check connection', 'err');
+  }
+}
+
 /* ── PASSWORD LOCK ── */
 #lockScreen {
   position: fixed;
@@ -1219,6 +1245,7 @@ textarea { resize: vertical; min-height: 70px; }
         <p style="font-size:13px;color:var(--text-2);margin-bottom:16px">Data syncs to Google Sheets automatically. On a new device, tap "Sync from Sheets" to load all your records.</p>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
           <button class="btn btn-primary" onclick="loadFromSheet().then(()=>{buildFilterDDs();renderRecords();toast('Synced from Sheets!')})"><i class="ti ti-refresh"></i> Sync from Sheets</button>
+          <button class="btn btn-ghost" onclick="pushMissingToSheet()"><i class="ti ti-upload"></i> Push missing to Sheet</button>
           <button class="btn btn-ghost" onclick="exportCSV()"><i class="ti ti-download"></i> Export CSV</button>
           <button class="btn btn-ghost" onclick="openImport()"><i class="ti ti-upload"></i> Import CSV</button>
           <a class="btn btn-ghost" href="https://docs.google.com/spreadsheets/d/1EQTcTs4mSdkjoG4FpHa-YhYGJ8jkKvtDscV4uuj21Nc/edit" target="_blank"><i class="ti ti-table"></i> View Sheet</a>
@@ -1820,7 +1847,7 @@ function renderRecords(){
     <td class="col-items" style="font-size:11px;color:var(--text-2)">${(r.items||[]).map(i=>i.name).join(', ')||'—'}</td>
     <td class="col-amount" style="font-size:12px;font-weight:500;color:var(--accent)">${r.total?'₹'+fmt(r.total):'—'}</td>
     <td class="col-actions">
-      <button class="btn btn-ghost btn-sm" onclick="openActionMenu(${r.id},this)" style="font-size:18px;padding:4px 10px;letter-spacing:1px">···</button>
+      <button class="btn btn-ghost btn-sm" onclick="openActionMenu(${r.id},this)" style="font-size:16px;padding:5px 8px"><i class="ti ti-dots-vertical"></i></button>
     </td>
   </tr>`).join('');
   document.getElementById('recordsTable').innerHTML=`<table class="records-table"><thead><tr><th class="col-date">Date</th><th class="col-vendor">Vendor</th><th class="col-head">Head</th><th>Items</th><th class="col-amount">Amount</th><th class="col-actions"></th></tr></thead><tbody>${rows}</tbody></table>`;
@@ -2284,6 +2311,36 @@ function resetUpload(){
   document.getElementById('uploadBtns').style.display='none';
   document.getElementById('extractStatus').innerHTML='';
   upUrl=null;upB64=null;upMeta={};
+}
+
+/* ─ PUSH MISSING TO SHEET ─ */
+async function pushMissingToSheet() {
+  setSyncStatus('busy', 'Checking Sheet...');
+  try {
+    const res = await fetch(SCRIPT_URL + '?load=1', { mode: 'cors' });
+    const data = await res.json();
+    const sheetIds = new Set((data.records || []).map(r => String(r.id)));
+    const local = getRecs();
+    const missing = local.filter(r => !sheetIds.has(String(r.id)));
+    if (!missing.length) {
+      setSyncStatus('ok', 'All records in Sheet');
+      toast('Nothing missing — Sheet is up to date!');
+      return;
+    }
+    toast('Found ' + missing.length + ' missing — syncing...');
+    for (let i = 0; i < missing.length; i++) {
+      setSyncStatus('busy', 'Pushing ' + (i+1) + ' of ' + missing.length + '...');
+      const rec = { ...missing[i] };
+      delete rec.image;
+      await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'insert', ...rec }), mode: 'no-cors' });
+      if (i < missing.length - 1) await new Promise(r => setTimeout(r, 600));
+    }
+    setSyncStatus('ok', 'Pushed ' + missing.length + ' records · ' + new Date().toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit'}));
+    toast('Done! ' + missing.length + ' records synced to Sheet');
+  } catch(err) {
+    setSyncStatus('err', 'Push failed');
+    toast('Push failed — check connection', 'err');
+  }
 }
 
 /* ── PASSWORD LOCK ── */
